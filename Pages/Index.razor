@@ -1,202 +1,180 @@
 ﻿@page "/"
 @using System
 
-<h1>Blazor Calculator</h1>
-<h2>Simple Calculator</h2>
-<div>
-    <input type="text" @bind="firstNum" />
-    <select @bind = "operation">
-        <option>+</option>
-        <option>-</option>
-        <option>/</option>
-        <option>*</option>
-        <option>^</option>
-        
-    </select>
-    <input type="text" @bind="secondNum" />
-    <button @onclick="Calculate">=</button>
-</div>
-<div>
-    <p>Ошибки:</p>
-    <input type="text" style="overflow-y:scroll" @bind="display" readonly />
-</div>
+<h3>Blazor Engineer Calculator</h3>
 
-<div>
-    <button @onclick ="MemorySave">MS </button>
-    <button @onclick="MemoryClear"> MC</button>
-    <button @onclick ="MemoryRecall"> MR</button>
-    <button @onclick="MemoryPlus"> M+</button>
-    <button @onclick="MemoryMinus"> M-</button>
-</div>
-<button @onclick ="ClearAll">A/C</button>
+<input @bind="display" style="width: 200px" readonly />
+<br />
+<button @onclick="MemorySave">MS </button>
+<button @onclick="MemoryClear"> MC</button>
+<button @onclick="MemoryRecall"> MR</button>
+<button @onclick="MemoryPlus"> M+</button>
+<button @onclick="MemoryMinus"> M-</button>
 
-<h2>Complex Calculator</h2>
+<br />
+<button @onclick=@(_=>AddNumber("7"))>7</button>
+<button @onclick=@(_=>AddNumber("8"))>8</button>
+<button @onclick=@(_=>AddNumber("9"))>9</button>
+<button @onclick=@(_=>AddOperator("/"))>/</button>
+<button @onclick=@(_=>AddOperator("^"))>^</button>
+<button @onclick=@(_=>AddOperator("sin"))>sin</button>
+<button @onclick=@(_=>AddOperator("ln"))>ln</button>
 
-<select @bind="complexOperation">
-    <option>sin</option>
-    <option>cos</option>
-    <option>tan</option>
-    <option>arctan</option>
-    <option>ln</option>
-    <option>exp</option>
-    <option>1/x</option>
-</select>
-<input type="text" @bind="complexNum" />
-<select @bind="complexOperation">
-    <option>!</option>
 
-</select>
-<button @onclick="ComplexCalculate">=</button>
+<br />
+<button @onclick=@(_=>AddNumber("4"))>4</button>
+<button @onclick=@(_=>AddNumber("5"))>5</button>
+<button @onclick=@(_=>AddNumber("6"))>6</button>
+<button @onclick=@(_=>AddOperator("*"))>*</button>
+<button @onclick=@(_=>AddOperator("!"))>!</button>
+<button @onclick=@(_=>AddOperator("cos"))>cos</button>
+<button @onclick=@(_=>AddOperator("1/x"))>1/x</button>
 
-    
-
+<br />
+<button @onclick=@(_=>AddNumber("1"))>1</button>
+<button @onclick=@(_=>AddNumber("2"))>2</button>
+<button @onclick=@(_=>AddNumber("3"))>3</button>
+<button @onclick=@(_=>AddOperator("-"))>-</button>
+<button @onclick=@(_=>AddOperator("e"))>e</button>
+<button @onclick=@(_=>AddOperator("tan"))>tan</button>
+<br />
+<button @onclick="Clear">C</button>
+<button @onclick=@(_=>AddNumber("0"))>0</button>
+<button @onclick="Calculate">=</button>
+<button @onclick=@(_=>AddOperator("+"))>+</button>
+<button @onclick=@(_=>AddOperator("arctan"))>arctan</button>
 
 
 @code {
-    string display ;
-    string firstNum;
-    string secondNum;
-    string complexNum;
-    string operation = "+" ;
-    string complexOperation = "sin";
-    string memory, complexMemory;
+
+    private string display = "";
+    private string currentNumber = "";
+    private string currentOperator = " ";
+    private double result;
+
+    private void AddNumber(string value)
+    {
+        currentNumber += value;
+        display += value;
+    }
+
+    private void AddOperator(string value)
+    {
+        currentOperator = value;
+        display += $" {value} ";
+    }
 
     private void Calculate()
     {
         try
         {
-            if (firstNum?.Length != null && secondNum?.Length != null)
+            double num1 = Convert.ToDouble(currentNumber.Substring(0, display.IndexOf(currentOperator) - 1));
+
+            switch (currentOperator)
             {
-                double num1 = Convert.ToDouble(firstNum);
-                double num2 = Convert.ToDouble(secondNum);
-
-                switch (operation)
-                {
-                    case "+":
-                        firstNum = (num1 + num2).ToString();
-                        secondNum = "";
-                        break;
-                    case "-":
-                        firstNum = (num1 - num2).ToString();
-                        secondNum = "";
-                        break;
-                    case "*":
-                        firstNum = (num1 * num2).ToString();
-                        secondNum = "";
-                        break;
-                    case "/":
-                        if (num2 == 0)
-                            secondNum = "";
-                        else
+                case "+":
+                    double num2 = Convert.ToDouble(display.Substring(display.LastIndexOf(currentOperator) + 2));
+                    result = num1 + num2;
+                    break;
+                case "-":
+                    num2 = Convert.ToDouble(display.Substring(display.LastIndexOf(currentOperator) + 2));
+                    result = num1 - num2;
+                    break;
+                case "*":
+                    num2 = Convert.ToDouble(display.Substring(display.LastIndexOf(currentOperator) + 2));
+                    result = num1 * num2;
+                    break;
+                case "/":
+                    num2 = Convert.ToDouble(display.Substring(display.LastIndexOf(currentOperator) + 2));
+                    result = num1 / num2;
+                    break;
+                case "^":
+                    num2 = Convert.ToDouble(display.Substring(display.LastIndexOf(currentOperator) + 2));
+                    result = Math.Pow(num1, num2);
+                    break;
+                case "sin":
+                    result = Math.Sin(num1);
+                    break;
+                case "cos":
+                    result = Math.Cos(num1);
+                    break;
+                case "tan":
+                    result = Math.Tan(num1);
+                    break;
+                case "arctan":
+                    result = Math.Atan(num1);
+                    break;
+                case "ln":
+                    result = Math.Log(num1);
+                    break;
+                case "exp":
+                    result = Math.Exp(num1);
+                    break;
+                case "1/x":
+                    result = (1 / num1);
+                    break;
+                case "!":
+                    int numInt = Convert.ToInt16(num1);
+                    if (num1 == 0 || num1 == 1)
+                        result = 1;
+                    else
+                    {
+                        int res = numInt;
+                        for (int i = numInt; i > 1; i--)
                         {
-                            decimal currentResult = Convert.ToDecimal(num1 / num2);
-                            firstNum = Math.Round(currentResult, 2).ToString();
-                            secondNum = "";
+                            res *= i - 1;
                         }
-                        break;
-                    case "^":
-                        firstNum = Math.Pow(num1, num2).ToString();
-                        secondNum = "";
-                        break;
-                }
+                        result = res;
+                    }
+                    break;
+                default:
+                    break;
             }
-        }
-        catch(Exception ex)
-        {
-            display += ex.Message;
-        }
 
+            display = result.ToString();
+            currentNumber = result.ToString();
+            currentOperator = " ";
+        }
+        catch (Exception ex)
+        {
+            display = ex.Message;
+        }
     }
-    private void ComplexCalculate()
-    {
-        try
-        {
-            if(complexNum?.Length != null)
-            {
-                double num = Convert.ToDouble(complexNum);
-                switch (complexOperation)
-                {
-                    case "sin":
-                        complexNum = Math.Sin(num).ToString();
-                        break;
-                    case "cos":
-                        complexNum = Math.Cos(num).ToString();
-                        break;
-                    case "tan":
-                        complexNum = Math.Tan(num).ToString();
-                        break;
-                    case "arctan":
-                        complexNum = Math.Atan(num).ToString();
-                        break;
-                    case "ln":
-                        complexNum = Math.Log(num).ToString();
-                        break;
-                    case "exp":
-                        complexNum = Math.Exp(num).ToString();
-                        break;
-                    case "1/x":
-                        complexNum = (1 / num).ToString();
-                        break;
-                    case "!":
-                        int numInt = Convert.ToInt16(num);
-                        if (num == 0 || num == 1)
-                            complexNum = "1";
-                        else
-                        {
-                            int res = numInt;
-                            for(int i = numInt; i > 1; i--)
-                            {
-                                res *= i - 1;
-                            }
-                            complexNum = res.ToString();
-                        }
-                        break;
-                }
-            }
-        }
-        catch(Exception ex)
-        {
-            display += ex.Message;
-        }
-    }    
+
+    string memory = "";
     private void MemorySave()
     {
-        memory = firstNum;
-        complexMemory = complexNum;
+        memory = currentNumber;
     }
 
     private void MemoryClear()
     {
         memory = "";
-        complexMemory = "";
     }
 
     private void MemoryRecall()
     {
-        firstNum = memory;
-        complexNum = complexMemory;
+        display = memory;
     }
     private void MemoryPlus()
     {
-        double currNum = Convert.ToDouble(firstNum);
-        firstNum = (Convert.ToDouble(memory) + currNum).ToString();
-        double compCurrNum = Convert.ToDouble(complexNum);
-        complexNum = (Convert.ToDouble(complexMemory) + compCurrNum).ToString();
+        double currNum = Convert.ToDouble(display);
+        display = (Convert.ToDouble(memory) + currNum).ToString();
     }
     private void MemoryMinus()
     {
-        double currNum = Convert.ToDouble(firstNum);
-        firstNum = (Convert.ToDouble(memory) - currNum).ToString();
-        double compCurrNum = Convert.ToDouble(complexNum);
-        complexNum = (Convert.ToDouble(complexMemory) - compCurrNum).ToString();
+        string savedVar = display;
+        double currNum = Convert.ToDouble(savedVar);
+        display = (Convert.ToDouble(memory) - currNum).ToString();
     }
 
-    private void ClearAll()
+    private void Clear()
     {
-        firstNum = "";
-        secondNum = "";
-        complexNum = "";
         display = "";
+        currentNumber = "";
+        currentOperator = " ";
+        result = 0;
     }
 }
- 
+
+
